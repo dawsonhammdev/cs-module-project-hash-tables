@@ -11,7 +11,6 @@ class HashTableEntry:
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
 
-
 class HashTable:
     """
     A hash table that with `capacity` buckets
@@ -22,7 +21,10 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-
+        self.capacity = capacity
+        self.contents = [None] * capacity
+        self.size = 0
+        
 
     def get_num_slots(self):
         """
@@ -35,6 +37,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        return len(self.contents)
 
 
     def get_load_factor(self):
@@ -44,7 +47,9 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        # // = whole number  / = decimals
+        return self.size / self.capacity
+        
 
     def fnv1(self, key):
         """
@@ -63,6 +68,16 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
+                                                                                                                                    
+        hash = 5381
+        # byte_array = key.encode('utf-8')
+
+
+        for byte in key:
+            # the modulus keeps it 32-bit, python ints don't overflow
+            hash = (hash * 33) + ord(byte)
+
+        return hash
 
 
     def hash_index(self, key):
@@ -71,6 +86,7 @@ class HashTable:
         between within the storage capacity of the hash table.
         """
         #return self.fnv1(key) % self.capacity
+        
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
@@ -82,6 +98,59 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        index = self.hash_index(key)
+        # check if the index is not in the table create a new one
+        if not self.contents[index]:
+            self.contents[index] = HashTableEntry(key,value)
+            # speeding up the process instead of checking length.
+            self.size =+ 1
+        else:
+            current = self.contents[index]
+            while current.next is not None and current.key is not key:
+                current = current.next
+            if current.key is key:
+                current.value = value
+            else:
+                current.next = HashTableEntry(key,value)
+                # speeding up the process instead of checking length.
+                self.size =+ 1
+
+
+
+
+
+
+
+
+        """For a given key, store a value in the hash table"""
+        # find the index of the key
+        # entry_index = self.hash_index(key)
+        
+        # # check to see if there is already an entry at that key
+        # if self.contents[entry_index] is None:
+        #     # creating the new entry
+        #     new_entry = HashTableEntry(key,value)
+        #     # assigning the new entry to the contents of that index
+        #     self.contents[entry_index] = new_entry
+        # current_entry = self.contents[entry_index]
+        # # while there is a current entry there.
+        # while current_entry:
+        #     # if the current entry's key is equal to the key
+        #     if current_entry.key == key:
+        #         # then we need to overwrite the current entry's value with the new value.
+        #         current_entry.value = value
+        #     # we are pointing the new head to the new value
+        #     current_entry = current_entry.next
+        #     # the old head is now current entry
+        #     old_head = current_entry 
+        #     new_head = HashTableEntry(key, value) 
+        #     new_entry = self.contents[entry_index] 
+        #     new_head.next = old_head
+        # self.size += 1
+
+
+
+        
 
 
     def delete(self, key):
@@ -93,6 +162,27 @@ class HashTable:
         Implement this.
         """
         # Your code here
+        if self.get(key) is None:
+            return None
+        self.put(key, None) 
+ 
+
+
+
+        # hash the key and find the index
+        # index = self.hash_index(key)
+        # # search the linked list for the hashtable entry
+        # # set a variable called 'current' to be show contents of the index
+        # current = self.contents[index]
+        # while current is not None:
+        #     if current.key == key:
+        #         current.value = None
+        #     else:
+        #         # looking to the next value in the linked list
+        #         current = current.next
+        
+        
+
 
 
     def get(self, key):
@@ -104,7 +194,20 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        # find the index for the given key
+        entry_index = self.hash_index(key)
+        # set a variable called 'current' to be show contents of the index
+        current = self.contents[entry_index]
+        # while current is not none 
+        while current is not None:
+            # check if current's key is == to the key we searched
+            if current.key == key:
+                # if it is then return the value
+                return current.value
+            # else look to the next value in linked list and compare again.
+            else:
+                # looking to the next value in the linked list
+                current = current.next
 
     def resize(self, new_capacity):
         """
@@ -114,7 +217,18 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        old_contents = self.contents
+        self.contents = [None] * new_capacity
+        self.capacity = new_capacity
+        for i in old_contents:
+            current = i
+            # if we reach the end of the list
+            if current.next is None:
+                self.put(current.key, current.value)
+            while current.next is not None:
+                self.put(current.key, current.value)
+                current = current.next
+            self.put(current.key, current.value)
 
 
 if __name__ == "__main__":
