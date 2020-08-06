@@ -82,3 +82,10 @@ full-featured.)
 * [Cracking Caesar Ciphers](applications/crack_caesar/)
 * [Sum and Difference](applications/sumdiff/)
 
+# word and histo are close.
+# dups
+# look up table or markov
+# ceasar
+
+
+
